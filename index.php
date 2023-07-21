@@ -12,14 +12,11 @@
       crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   </head>
-
   <body>
+    <?php $response = []; ?>
     <section class="section">
-
-
       <!-- two columns -->
       <div class="columns">
-
         <!-- COL 1 -->
         <div class="column">
           <h1 class="title is-1">Budget Buddy</h1>
@@ -28,62 +25,49 @@
           </p>
           <p class="subtitle">Please login to download your expenses report</p>
           <br>
-          <form action="<?php echo $_SERVER['PHP_SELF'];?>" method="post">
-            <div class="field">
-              <p class="control has-icons-left has-icons-right">
-                <input class="input" type="email" name="email" placeholder="Email">
-                <span class="icon is-small is-left">
-                  <i class="fas fa-envelope"></i>
-                </span>
-              </p>
-            </div>
-            <div class="field">
-              <p class="control has-icons-left">
-                <input class="input" type="password" name="password" placeholder="Password">
-                <span class="icon is-small is-left">
-                  <i class="fas fa-lock"></i>
-                </span>
-              </p>
-            </div>
-            <div class="field">
-              <p class="control">
-                <input type="submit" class="button is-danger" value="Login"/>
-              </p>
-            </div>
-          </form>
-          <?php
-                if (isset($_POST['email']) && isset($_POST['password'])) { 
-                //retrieve the values from html form 
-                $email = $_POST['email']; 
-                $password = $_POST['password']; 
+          <?php if (!$response["user"]) {
+              require "login-form.php";
+          } ?>
 
-                // connecting to db 
-                require_once __DIR__ . '/api/v1/dbConnect.php'; 
-                $db= new DB_CONNECT(); 
-                $db->connect();
-                $sqlCommand="SELECT * FROM users WHERE email = '$email' AND password = '$password'";
-                $result =mysqli_query($db->myconn, "$sqlCommand"); 
-                // check the result 
-                if (mysqli_num_rows($result) > 0) {
+          <?php 
+          session_start();
+          if (isset($_POST["email"]) && isset($_POST["password"])) {
+              //retrieve the values from html form
+              $email = $_POST["email"];
+              $password = $_POST["password"];
+
+              // connecting to db
+              require_once __DIR__ . "/api/v1/dbConnect.php";
+              $db = new DB_CONNECT();
+              $db->connect();
+              $sqlCommand = "SELECT * FROM users WHERE email = '$email' AND password = '$password'";
+              $result = mysqli_query($db->myconn, "$sqlCommand");
+
+              // check the result
+              if (mysqli_num_rows($result) > 0) {
                   $row = mysqli_fetch_assoc($result);
-                  echo "<p class='subtitle'> Hi <strong>".$row["name"]."</strong>, your report is ready for download<p><br>";
+                  $user = [
+                      "userId" => (int) $row["userId"],
+                      "name" => $row["name"],
+                      "email" => $row["email"],
+                      "password" => $row["password"],
+                      "createdOn" => $row["createdOn"],
+                  ];
+                  $response["user"] = $user;
+                  $_SESSION["userId"] =(int)$row["userId"];
+                  $_SESSION["name"] =$row["name"];
+
+                  echo "<p class='subtitle'> Hi <strong>" .
+                      $row["name"] .
+                      "</strong>, your report is ready for download<p><br>";
                   echo "<button class='button is-danger'>Download</button>";
-                } else { 
+                  header("location: report.php");
+              } else {
                   // Handling error response
-                  echo "<br><p class='subtitle'> Login request failed<p>"; 
-               
-                } 
-                $db->close($db->myconn); 
-              
-                } 
-            ?>
-                   
-          <!-- DOWNLOAD BUTTON -->
-          <!-- <p class="subtitle">
-          Hi username, expense report from date to date or have another form for filter reports.
-        </p> -->
-          <!-- down show when user logged in PHP to handle download request-->
-          <!-- <button class="button is-danger is-medium">Download</button> -->
+                  echo "<br><p class='subtitle'> Login request failed<p>";
+              }
+              $db->close($db->myconn);
+          } ?>
         </div>
         <!-- COL 2 -->
         <div class="column">
