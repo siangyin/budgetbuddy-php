@@ -49,16 +49,17 @@ if ($expenseId > 0 && $userId > 0) {
     // Retrieve expenses list based on userId, categories and date start to end period range
     $sql .= " WHERE userId = '$userId' AND category IN ('$categories') AND date BETWEEN '$start' AND '$end'";
 } elseif ($userId > 0 && !empty($start) && !empty($end)) {
-     // Retrieve expenses list based on userId, and date start to end period range
+     // Retrieve expenses list based on userId, and date start to end period range (no categories filters)
     $sql .= " WHERE userId = '$userId' AND date BETWEEN '$start' AND '$end'";
 } elseif ($userId > 0 && !empty($categories)) {
-    // Retrieve expenses list based on userId, and categories
+    // Retrieve expenses list based on userId, and categories (no date range filter)
     $sql .= " WHERE userId = '$userId' AND category IN ('$categories')";
 } elseif ($userId > 0) {
-    // Retrieve expenses list based on userId
+    // Retrieve expenses list based on userId (all expenses, without any filter)
     $sql .= " WHERE userId = '$userId'";
 } // else will retrieve all expenses in database if none of any conditions is met
 
+$sql .= " ORDER BY DATE ASC";
 $result = mysqli_query($db->myconn, $sql);
 if ($result) {
     $data = [];

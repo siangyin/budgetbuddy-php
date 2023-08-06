@@ -22,11 +22,6 @@ if (empty($name) || empty($email) || empty($password)) {
         $response = array("status" => 0, "message" => "Invalid email format");
         echo json_encode($response);
     } else {
-        // Sanitize and escape input before using in SQL query
-        $name = mysqli_real_escape_string($db->myconn, $name);
-        $email = mysqli_real_escape_string($db->myconn, $email);
-        $password = mysqli_real_escape_string($db->myconn, $password);
-
         // Check if email is already registered
         $sql = "SELECT * FROM users WHERE email = '$email'";
         $result = mysqli_query($db->myconn, $sql);

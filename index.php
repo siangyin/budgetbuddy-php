@@ -1,6 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
 
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -13,7 +12,10 @@
 
   </head>
   <body>
-    <?php $response = []; ?>
+    <?php 
+    session_start();
+    $response = []; 
+    ?>
     <section class="section">
       <!-- two columns -->
       <div class="columns">
@@ -25,12 +27,12 @@
           </p>
           <p class="subtitle">Please login to download your expenses report</p>
           <br>
-          <?php if (!$response["user"]) {
+          <?php if (!array_key_exists("user",$response)) {
               require "login-form.php";
           } ?>
 
           <?php 
-          session_start();
+          
           if (isset($_POST["email"]) && isset($_POST["password"])) {
               //retrieve the values from html form
               $email = $_POST["email"];
